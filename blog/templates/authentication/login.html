@@ -1,12 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    {{login_form.as_p}}
-</body>
-</html>
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block bodyblock %}
+  <form method="POST">
+    <div id="div_id_username" class="mb-3">
+        <label for="id_username" class="form-label requiredField">
+          Username
+        </label>
+        <input
+          type="text"
+          name="username"
+          maxlength="150"
+          class="textinput textInput form-control"
+          required
+          id="id_username"
+        />
+        <small id="hint_id_username" class="form-text text-muted"
+          >Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+          only.</small
+        >
+      </div>
+    <div id="div_id_password" class="mb-3">
+      <label for="id_password" class="form-label requiredField">
+        Password
+      </label>
+      <input
+        type="password"
+        name="password"
+        maxlength="128"
+        class="textinput textInput form-control"
+        required
+        id="id_password"
+      />
+    </div>
+
+    <button class="btn btn-primary">Login</button>
+    {% csrf_token %}
+  </form>
+{% endblock %}
