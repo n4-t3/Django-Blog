@@ -24,6 +24,8 @@ def create_blog(request):
             user = User.objects.get(username = request.user.username)
             author = UserProfile.objects.get(user=user)
             pre_save_blog.author = author
+            if 'cover_image' in request.FILES:
+                pre_save_blog.cover_image = request.FILES['cover_image']
             pre_save_blog.save()
             return HttpResponseRedirect(reverse('authentication:home_page'))
         else:
@@ -39,3 +41,10 @@ def personal_blog(request,pk):
         "create_comment":CreateComment
     }
     return render(request,'post/my_blog.html',context=my_dict)
+
+def read_blog(request,pk):
+    blog = models.Blog.objects.get(pk =pk)
+    my_dict = {
+        "blog":blog
+    }
+    return render(request,'post/read_blog.html',context=my_dict)

@@ -10,4 +10,4 @@ class UserCreationForm(forms.ModelForm):
 class UserCreationDate(forms.ModelForm):
     class Meta:
         model = models.UserProfile
-        exclude = ('user','created_at','updated_at','followers')
+        fields = ["profile_pic"]

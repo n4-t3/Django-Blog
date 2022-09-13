@@ -24,6 +24,8 @@ def signup_page(request):
             pre_save_form.save()
             pre_save_time = time_form.save(commit=False)
             pre_save_time.user = pre_save_form
+            if 'profile_pic' in request.FILES:
+                pre_save_time.profile_pic = request.FILES['profile_pic']
             pre_save_time.save()
             return HttpResponseRedirect(reverse('authentication:home_page'))
         else:

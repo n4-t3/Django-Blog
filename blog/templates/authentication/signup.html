@@ -4,6 +4,7 @@
 {% block bodyblock %}
 <form method="POST">
     {{signup_form | crispy}}
+    {{time_form | crispy}}
     {% csrf_token %}
     <Button class="btn btn-primary" type="submit">Signup</Button>
 </form>

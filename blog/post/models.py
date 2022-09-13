@@ -11,6 +11,8 @@ class Blog(models.Model):
     category = models.CharField(max_length=255)
     blog_title = models.CharField(max_length=255,blank=False)
     blog_body = RichTextField(blank=False, null = False)
+    summary = models.CharField(max_length=255,default="Summary was not provided :(")
+    cover_image = models.ImageField(upload_to='covers',blank = True)
     likes = models.ManyToManyField(UserProfile,related_name='likers')
 
     def __str__(self):
