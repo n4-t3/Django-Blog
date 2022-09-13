@@ -21,7 +21,7 @@
               </li>
               {% if user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link" href="#">My Blogs</a>
+                <a class="nav-link" href="{% url 'post:personal_blog' user.id %}">My Blogs</a>
               </li>
               {% endif %}
               <li class="nav-item">
@@ -30,17 +30,20 @@
               <li class="nav-item">
                 <a class="nav-link" href="#">Profile</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'authentication:signup_page' %}">Signup</a>
-            </li>
               {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Logout</a>
+                    <a class="nav-link" href="{% url 'authentication:logout_page' %}">Logout</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'post:create_blog' %}">Create</a>
+              </li>
               {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'authentication:login_page' %}">Login</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'authentication:signup_page' %}">Signup</a>
+              </li>
             {% endif %}
             </ul>
             <form class="d-flex" role="search" request="POST">

@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django import forms
 from .forms import UserCreationForm,UserCreationDate
 from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 def home_page(request):
@@ -43,3 +44,8 @@ def login_page(request):
         else:
             raise forms.ValidationError(('Something went wrong, try again!'),code= 'invalid')  
     return render(request,'authentication/login.html',context={})
+
+@login_required
+def logout_page(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('authentication:home_page'))

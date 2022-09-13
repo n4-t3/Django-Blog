@@ -3,8 +3,9 @@
 {% load crispy_forms_tags %}
 {% block bodyblock %}
 <form method="POST">
-    {{signup_form | crispy}}
+    {{create_blog | crispy}}
+    {{create_blog.media}}
     {% csrf_token %}
-    <Button class="btn btn-primary" type="submit">Signup</Button>
+    <Button class="btn btn-primary" type="submit">Create Blog</Button>
 </form>
 {% endblock %}
