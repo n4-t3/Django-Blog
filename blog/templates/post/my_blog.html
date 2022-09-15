@@ -14,8 +14,8 @@
           <h3>{{blog.blog_title |title}}</h3>
           <div class="text-center text-muted">{{blog.category}}</div>
           <p>{{blog.summary}}</p>
-          <button href="{% url 'post:read_blog' blog.id %}" class="btn btn-primary">Read</button>
-          <button href="#" class="btn btn-secondary">Edit</button>
+          <a href="{% url 'post:read_blog' blog.id %}" class="btn btn-primary">Read</a>
+          <a href="#" class="btn btn-secondary">Edit</a>
         </div>
       </div>
     </div>
