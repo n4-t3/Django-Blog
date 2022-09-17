@@ -2,10 +2,10 @@
 {% extends 'base.html' %}
 {% block bodyblock %}
 <div class="mt-4 p-5 bg-light text-body rounded">
-    <h1 class="display-2">{{blog.blog_title |title}}</h1><hr>
-    <div class="text-center text-muted lead">{{blog.category}}</div>
-    <div class="text-center text-muted lead">Latest Update: {{blog.updated_date}}</div>
-    <h3 class="display-4">{{blog.summary}}.</h3>
-    <p class="lead">{{blog_body}}</p>
+    <h1 class="display-2 text-center">{{blog.blog_title |title}}</h1><hr>
+    <div class="text-center text-muted lead">Category: {{blog.category}}</div>
+    <div class="text-center text-muted lead">Latest Update: {{blog.updated_date|date:"Y/m/d" }}</div>
+    <h3 class="lead mt-2">{{blog.summary}}.</h3>
+    <p class="lead">{{blog.blog_body | safe}}</p>
 </div>
 {% endblock %}

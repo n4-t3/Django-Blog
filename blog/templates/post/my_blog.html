@@ -1,24 +1,29 @@
 <!DOCTYPE html>
 {% extends 'base.html' %} {% load crispy_forms_tags %} {% block bodyblock %}
 
-  <div class="row mt-5">
-    {% for blog in blogs %}
-    <div class="bg-light col-sm-6 col-md-3 mx-3 my-3 p-4 round-3">
-      <div class="thumbnail">
-        {% if blog.cover_image %} 
-        <img src="{{blog.cover_image.url}}" alt="blog cover" class="round-3 img-fluid mb-2" />
-        {% else %}
-        <img src="/media/covers/retrosupply-jLwVAUtLOAQ-unsplash.jpg" alt="blog cover" class="round-3 img-fluid mb-2" />
-        {% endif %}
-        <div class="caption">
-          <h3>{{blog.blog_title |title}}</h3>
-          <div class="text-center text-muted">{{blog.category}}</div>
-          <p>{{blog.summary}}</p>
-          <a href="{% url 'post:read_blog' blog.id %}" class="btn btn-primary">Read</a>
-          <a href="#" class="btn btn-secondary">Edit</a>
-        </div>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  {% for blog in blogs %}
+  <div class="col">
+    <div class="card">
+      {% if blog.cover_image %}
+      <img src="{{blog.cover_image.url}}" alt="blog cover" class="round-3 img-fluid mb-2" />
+      {% else %}
+      <img src="/media/covers/retrosupply-jLwVAUtLOAQ-unsplash.jpg" alt="blog cover" class="round-3 img-fluid mb-2" />
+      {% endif %}
+      <div class="card-body">
+        <h5 class="card-title display-6 text-center">{{blog.blog_title |title}}</h5>
+        <p class="card-text lead"><small>{{blog.summary}}</small></p>
       </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex flex-row gap-2 justify-content-center">
+          <a href="{% url 'post:read_blog' blog.id %}" class="btn btn-primary">Read</a>
+          <a href="{% url 'post:edit_blog' blog.id %}" class="btn btn-secondary">Edit</a>
+          <a href="{% url 'post:delete_blog' blog.id %}" class="btn btn-danger">Delete</a>
+        </li>
+        <li class="list-group-item lead">Category: <small>{{blog.category|title}}</small></li>
+      </ul>
     </div>
-    {% endfor %}
   </div>
+  {% endfor %}
+</div>
 {% endblock %}

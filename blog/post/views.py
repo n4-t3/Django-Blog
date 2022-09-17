@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponse,HttpResponseRedirect
+from django.shortcuts import render,redirect
+from django.http import HttpResponseRedirect,HttpResponseForbidden
 from django.urls import reverse
 from .forms import CreateBlog,CreateComment
 from django.contrib.auth.decorators import login_required
@@ -7,10 +7,9 @@ from authentication.models import UserProfile
 from django.contrib.auth.models import User
 from django import forms
 from . import models
+from django.contrib import messages
 # Create your views here.
 
-def index(request):
-    return HttpResponse('hi')
 
 @login_required
 def create_blog(request):
@@ -29,7 +28,11 @@ def create_blog(request):
             pre_save_blog.save()
             return HttpResponseRedirect(reverse('authentication:home_page'))
         else:
-            raise forms.ValidationError("Something isn't right please try again!")
+            if blog_form.errors:
+                for field in blog_form.errors.as_data():
+                    for error in blog_form.errors.as_data()[field]:
+                        messages.error(request,f"{field} {error}")
+            return redirect("post:create_blog")
     return render(request,"post/create_blog.html",context=my_dict)
 
 @login_required
@@ -47,4 +50,42 @@ def read_blog(request,pk):
     my_dict = {
         "blog":blog
     }
+    blog.views = blog.views + 1
+    blog.save()
     return render(request,'post/read_blog.html',context=my_dict)
+
+@login_required
+def edit_blog(request,pk):
+    blog = models.Blog.objects.get(id=pk)
+    if str(request.user) != str(blog.author.user):
+        return HttpResponseForbidden('Access Restricted!')
+    form = CreateBlog(instance=blog)
+    my_dict = {
+        "create_blog": form
+    }
+    if request.method == "POST":
+        blog_form = CreateBlog(request.POST,instance=blog)
+        if blog_form.is_valid():
+            pre_save_blog = blog_form.save(commit=False)
+            user = User.objects.get(username = request.user.username)
+            author = UserProfile.objects.get(user=user)
+            pre_save_blog.author = author
+            if 'cover_image' in request.FILES:
+                pre_save_blog.cover_image = request.FILES['cover_image']
+            pre_save_blog.save()
+            return redirect("post:personal_blog", pk=user.id) 
+        else:
+            if blog_form.errors:
+                for field in blog_form.errors.as_data():
+                    for error in blog_form.errors.as_data()[field]:
+                        messages.error(request,f"{field} {error}")
+            return redirect("post:edit_blog", pk=pk)
+    return render(request,"post/create_blog.html",context=my_dict)
+
+@login_required
+def delete_blog(request,pk):
+    blog = models.Blog.objects.get(id=pk)
+    if str(request.user) != str(blog.author.user):
+        return HttpResponseForbidden('Access Restricted!')
+    blog.delete()
+    return redirect("post:personal_blog", pk=blog.author.user.id) 

@@ -1,10 +1,11 @@
 from django.http import HttpResponse,HttpResponseRedirect
 from django.urls import reverse
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django import forms
 from .forms import UserCreationForm,UserCreationDate
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 # Create your views here.
 
 def home_page(request):
@@ -29,7 +30,15 @@ def signup_page(request):
             pre_save_time.save()
             return HttpResponseRedirect(reverse('authentication:home_page'))
         else:
-            raise forms.ValidationError(('Something went wrong, try again!'),code= 'invalid')         
+            if created_form.errors:
+                for field1 in created_form.errors.as_data():
+                    for error1 in created_form.errors.as_data()[field1]:
+                        messages.error(request,f"{field1} {error1}")
+            if time_form.errors:
+                for field2 in time_form.errors.as_data():
+                    for error2 in created_form.errors.as_data()[field2]:
+                        messages.error(request,f"{field2} {error2}")
+            return redirect("authentication:signup_page")
     return render(request,'authentication/signup.html',context=my_dict)
 
 def login_page(request):
@@ -44,7 +53,8 @@ def login_page(request):
             else:
                 return HttpResponse('ACCOUNT IS NOT ACTIVE!')
         else:
-            raise forms.ValidationError(('Something went wrong, try again!'),code= 'invalid')  
+            messages.error(request,"Invalid username or password")
+            return redirect("authentication:login_page")
     return render(request,'authentication/login.html',context={})
 
 @login_required
