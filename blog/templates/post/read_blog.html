@@ -2,10 +2,22 @@
 {% extends 'base.html' %}
 {% block bodyblock %}
 <div class="mt-4 p-5 bg-light text-body rounded">
+    {%if messages %} {% for message in messages %}
+    <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+        {{message}}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %} {% endif %}
     <h1 class="display-2 text-center">{{blog.blog_title |title}}</h1><hr>
     <div class="text-center text-muted lead">Category: {{blog.category}}</div>
     <div class="text-center text-muted lead">Latest Update: {{blog.updated_date|date:"Y/m/d" }}</div>
+    <p class="lead text-end">Likes: <small>{{blog.likes.all |length}}</small></p>
+    <p class="lead text-end">Views: <small>{{blog.views}}</small></p>
     <h3 class="lead mt-2">{{blog.summary}}.</h3>
     <p class="lead">{{blog.blog_body | safe}}</p>
+    <form method="POST">
+        {% csrf_token%}
+        <button class="btn btn-outline-success">Like</button>
+    </form>
 </div>
 {% endblock %}

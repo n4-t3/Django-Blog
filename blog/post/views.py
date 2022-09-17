@@ -50,8 +50,26 @@ def read_blog(request,pk):
     my_dict = {
         "blog":blog
     }
-    blog.views = blog.views + 1
-    blog.save()
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            user = UserProfile.objects.get(user=request.user)
+            print('---------------------------------')
+            print(blog.likes.all())
+            if user in blog.likes.all():
+                blog.likes.remove(user)
+                messages.warning(request,"Unliked the post!")
+                return redirect("post:read_blog",pk=pk)
+            else:
+                blog.likes.add(user)
+                blog.save()
+                messages.success(request,"Liked the post!")
+                return redirect("post:read_blog",pk=pk)
+        else:
+            messages.info(request,"Login to like the post!")
+            return redirect("post:read_blog",pk=pk)
+    else:
+        blog.views = blog.views + 1
+        blog.save()
     return render(request,'post/read_blog.html',context=my_dict)
 
 @login_required
@@ -89,3 +107,11 @@ def delete_blog(request,pk):
         return HttpResponseForbidden('Access Restricted!')
     blog.delete()
     return redirect("post:personal_blog", pk=blog.author.user.id) 
+
+
+def public_blog(request):
+    my_dict={
+        'top_posts':models.Blog.objects.all().order_by('-likes')[:5],
+        'new_posts':models.Blog.objects.all().order_by('-updated_date')[:5]
+    }
+    return render(request,'post/public.html',context=my_dict) 
