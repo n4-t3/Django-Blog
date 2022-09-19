@@ -23,8 +23,6 @@
       <ul class="list-group list-group-flush">
         <li class="list-group-item d-flex flex-row gap-2 justify-content-center">
           <a href="{% url 'post:read_blog' blog.id %}" class="btn btn-primary">Read</a>
-          <a href="{% url 'post:edit_blog' blog.id %}" class="btn btn-secondary">Edit</a>
-          <a href="{% url 'post:delete_blog' blog.id %}" class="btn btn-danger">Delete</a>
         </li>
         <li class="list-group-item lead">Category: <small>{{blog.category|title}}</small></li>
       </ul>

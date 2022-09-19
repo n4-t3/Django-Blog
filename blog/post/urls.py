@@ -9,5 +9,6 @@ urlpatterns = [
     path('read/<int:pk>/', views.read_blog, name="read_blog"),
     path('edit/<int:pk>/', views.edit_blog, name="edit_blog"),
     path('delete/<int:pk>/', views.delete_blog, name="delete_blog"),
-    path('public_blog/', views.public_blog, name="public_blog"),
+    path('latest_blogs/', views.latest_blogs, name="latest_blogs"),
+    path('top_blogs/', views.top_blogs, name="top_blogs"),
 ]
