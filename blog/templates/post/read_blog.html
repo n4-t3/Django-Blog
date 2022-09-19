@@ -10,7 +10,7 @@
       {% endfor %} {% endif %}
     <h1 class="display-2 text-center">{{blog.blog_title |title}}</h1><hr>
     <div class="text-center text-muted lead">Category: {{blog.category}}</div>
-    <div class="text-center text-muted lead">Latest Update: {{blog.updated_date|date:"Y/m/d" }}</div>
+    <div class="text-center text-muted lead">Latest Update: {{blog.posted_date|date:"Y/m/d" }}</div>
     <p class="lead text-end">Likes: <small>{{blog.likes.all |length}}</small></p>
     <p class="lead text-end">Views: <small>{{blog.views}}</small></p>
     <h3 class="lead mt-2">{{blog.summary}}.</h3>

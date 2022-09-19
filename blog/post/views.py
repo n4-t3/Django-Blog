@@ -40,7 +40,7 @@ def personal_blog(request,pk):
     user = User.objects.get(pk =pk)
     author = UserProfile.objects.get(user=user)
     blogs = models.Blog.objects.filter(author=author)
-    pagination = Paginator(blogs,per_page=1)
+    pagination = Paginator(blogs,per_page=6)
     try:
         current_page = int(request.GET.get('page',1))
     except:
@@ -121,10 +121,44 @@ def delete_blog(request,pk):
     blog.delete()
     return redirect("post:personal_blog", pk=blog.author.user.id) 
 
-
-def public_blog(request):
-    my_dict={
-        'top_posts':models.Blog.objects.all().order_by('-likes')[:5],
-        'new_posts':models.Blog.objects.all().order_by('-updated_date')[:5]
+def top_blogs(request):
+    pagination = Paginator(models.Blog.objects.all().order_by('-likes'),per_page=4)
+    try:
+        current_page = int(request.GET.get('page',1))
+    except:
+        messages.error(request,"Page not found!")
+        return redirect("post:top_blog")
+    page_obj = pagination.get_page(current_page)
+    page = pagination.page(current_page)
+    my_dict = {
+        "blogs":page_obj,
+        "create_comment":CreateComment,
+        "number_of_pages": pagination.num_pages,
+        "pagination" : pagination,
+        "page_has_next":page.has_next(),
+        "page_has_previous":page.has_previous(),
+        "current_page":current_page, 
+        "page_range": pagination.get_elided_page_range(current_page, on_each_side=3, on_ends=2)
     }
-    return render(request,'post/public.html',context=my_dict) 
+    return render(request,'post/top_blogs.html',context=my_dict)
+
+def latest_blogs(request):
+    pagination = Paginator(models.Blog.objects.all().order_by('-posted_date'),per_page=4)
+    try:
+        current_page = int(request.GET.get('page',1))
+    except:
+        messages.error(request,"Page not found!")
+        return redirect("post:latest_blogs")
+    page_obj = pagination.get_page(current_page)
+    page = pagination.page(current_page)
+    my_dict = {
+        "blogs":page_obj,
+        "create_comment":CreateComment,
+        "number_of_pages": pagination.num_pages,
+        "pagination" : pagination,
+        "page_has_next":page.has_next(),
+        "page_has_previous":page.has_previous(),
+        "current_page":current_page, 
+        "page_range": pagination.get_elided_page_range(current_page, on_each_side=3, on_ends=2)
+    }
+    return render(request,'post/latest_blogs.html',context=my_dict)
