@@ -5,9 +5,9 @@ from .forms import CreateBlog,CreateComment
 from django.contrib.auth.decorators import login_required
 from authentication.models import UserProfile
 from django.contrib.auth.models import User
-from django import forms
 from . import models
 from django.contrib import messages
+from django.core.paginator import Paginator
 # Create your views here.
 
 
@@ -39,9 +39,24 @@ def create_blog(request):
 def personal_blog(request,pk):
     user = User.objects.get(pk =pk)
     author = UserProfile.objects.get(user=user)
+    blogs = models.Blog.objects.filter(author=author)
+    pagination = Paginator(blogs,per_page=1)
+    try:
+        current_page = int(request.GET.get('page',1))
+    except:
+        messages.error(request,"Page not found!")
+        return redirect("post:personal_blog", pk=pk)
+    page_obj = pagination.get_page(current_page)
+    page = pagination.page(current_page)
     my_dict = {
-        "blogs":models.Blog.objects.filter(author=author),
-        "create_comment":CreateComment
+        "blogs":page_obj,
+        "create_comment":CreateComment,
+        "number_of_pages": pagination.num_pages,
+        "pagination" : pagination,
+        "page_has_next":page.has_next(),
+        "page_has_previous":page.has_previous(),
+        "current_page":current_page, 
+        "page_range": pagination.get_elided_page_range(current_page, on_each_side=3, on_ends=2)
     }
     return render(request,'post/my_blog.html',context=my_dict)
 
@@ -53,8 +68,6 @@ def read_blog(request,pk):
     if request.method == "POST":
         if request.user.is_authenticated:
             user = UserProfile.objects.get(user=request.user)
-            print('---------------------------------')
-            print(blog.likes.all())
             if user in blog.likes.all():
                 blog.likes.remove(user)
                 messages.warning(request,"Unliked the post!")
