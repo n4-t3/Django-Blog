@@ -6,9 +6,10 @@
     <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
         {{message}}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-      {% endfor %} {% endif %}
-    <h1 class="display-2 text-center">{{blog.blog_title |title}}</h1><hr>
+    </div>
+    {% endfor %} {% endif %}
+    <h1 class="display-2 text-center">{{blog.blog_title |title}}</h1>
+    <hr>
     <div class="text-center text-muted lead">Category: {{blog.category}}</div>
     <div class="text-center text-muted lead">Latest Update: {{blog.updated_date|date:"Y/m/d" }}</div>
     <p class="lead text-end">Likes: <small>{{blog.likes.all |length}}</small></p>
@@ -17,7 +18,36 @@
     <p class="lead">{{blog.blog_body | safe}}</p>
     <form method="POST">
         {% csrf_token%}
-        <button class="btn btn-outline-success">Like</button>
+        <button type="submit" name="like" value="like" class="btn btn-outline-success">Like</button>
     </form>
 </div>
+<form method="POST">
+    {% if not user.is_authenticated %}
+    <fieldset disabled>
+        {% endif %}
+        <div class="d-flex flex-row mt-3">
+            <label for="inputcomment" class="form-label">Comment</label>
+            <input type="text" id="inputcomment" class="ms-3 form-control" aria-describedby="CommentHelpBlock"
+                name="user_comment">
+            {% csrf_token%}
+            <button type="submit" name="comment" value="comment" class="btn btn-primary ms-3">Comment</button>
+        </div>
+        {% if not user.is_authenticated %}
+        <div id="CommentHelpBlock" class="form-text">
+            You must be signed in to comment here.
+        </div>
+    </fieldset>
+    {% endif %}
+</form>
+{% for comment in comments %}
+<div class="card">
+    <div class="card-body lead">
+        <li class="list-group-item">Author: {{comment.comment_author}}</li>
+        <li class="list-group-item">Comment: {{comment.blog_comment}}</li>
+        {% if is_blog_author or user_profile == user %}
+        <li class="list-group-item"><a href="" class="btn btn-danger">Delete</a></li>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
 {% endblock %}

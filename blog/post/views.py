@@ -41,31 +41,44 @@ def personal_blog(request,pk):
     author = UserProfile.objects.get(user=user)
     my_dict = {
         "blogs":models.Blog.objects.filter(author=author),
-        "create_comment":CreateComment
     }
     return render(request,'post/my_blog.html',context=my_dict)
 
 def read_blog(request,pk):
     blog = models.Blog.objects.get(pk =pk)
+    user = UserProfile.objects.get(user=request.user)
+    main_user = request.user
     my_dict = {
-        "blog":blog
+        "blog":blog,
+        "comments": models.Comment.objects.filter(blog=blog).order_by("-post_date"),
+        "user_profile": main_user,
+        "is_blog_author":False,
     }
     if request.method == "POST":
         if request.user.is_authenticated:
             user = UserProfile.objects.get(user=request.user)
-            print('---------------------------------')
-            print(blog.likes.all())
-            if user in blog.likes.all():
-                blog.likes.remove(user)
-                messages.warning(request,"Unliked the post!")
-                return redirect("post:read_blog",pk=pk)
-            else:
-                blog.likes.add(user)
-                blog.save()
-                messages.success(request,"Liked the post!")
+            if request.POST.get("like"):
+                if user in blog.likes.all():
+                    blog.likes.remove(user)
+                    messages.warning(request,"Unliked the post!")
+                    return redirect("post:read_blog",pk=pk)
+                else:
+                    blog.likes.add(user)
+                    blog.save()
+                    messages.success(request,"Liked the post!")
+                    return redirect("post:read_blog",pk=pk)
+            if request.POST.get("comment"):
+                if request.user == blog.author:
+                    my_dict['is_blog_author'] =True
+                comment = request.POST.get("user_comment")
+                comment_form = CreateComment().save(commit=False)
+                comment_form.comment_author = user
+                comment_form.blog = blog
+                comment_form.blog_comment = comment
+                comment_form.save()
                 return redirect("post:read_blog",pk=pk)
         else:
-            messages.info(request,"Login to like the post!")
+            messages.info(request,"Login to like or comment on the post!")
             return redirect("post:read_blog",pk=pk)
     else:
         blog.views = blog.views + 1
