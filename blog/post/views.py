@@ -62,14 +62,20 @@ def personal_blog(request,pk):
 
 def read_blog(request,pk):
     blog = models.Blog.objects.get(pk =pk)
-    user = UserProfile.objects.get(user=request.user)
-    main_user = request.user
+    try:
+        user = UserProfile.objects.get(user=request.user)
+        main_user = request.user
+    except:
+        user = None
+        main_user = None
     my_dict = {
         "blog":blog,
         "comments": models.Comment.objects.filter(blog=blog).order_by("-post_date"),
         "user_profile": main_user,
         "is_blog_author":False,
     }
+    if request.user == blog.author.user:
+        my_dict['is_blog_author'] =True
     if request.method == "POST":
         if request.user.is_authenticated:
             user = UserProfile.objects.get(user=request.user)
@@ -84,8 +90,6 @@ def read_blog(request,pk):
                     messages.success(request,"Liked the post!")
                     return redirect("post:read_blog",pk=pk)
             if request.POST.get("comment"):
-                if request.user == blog.author:
-                    my_dict['is_blog_author'] =True
                 comment = request.POST.get("user_comment")
                 comment_form = CreateComment().save(commit=False)
                 comment_form.comment_author = user
@@ -100,6 +104,16 @@ def read_blog(request,pk):
         blog.views = blog.views + 1
         blog.save()
     return render(request,'post/read_blog.html',context=my_dict)
+
+@login_required
+def delete_comment(request,pk):
+    comment = models.Comment.objects.get(pk=pk)
+    blog = comment.blog
+    if request.user == blog.author.user or request.user == comment.comment_author.user:
+        comment.delete()
+        return redirect('post:read_blog',pk=blog.id)
+    else:
+        return HttpResponseForbidden('You don\'t have the right credentials!')
 
 @login_required
 def edit_blog(request,pk):
