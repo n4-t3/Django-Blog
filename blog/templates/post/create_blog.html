@@ -7,7 +7,8 @@
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %} {% endif %}
-    {{create_blog.media}} {{create_blog| crispy}} {% csrf_token %}
+    {{create_blog.media}} 
+    {{create_blog| crispy}} {% csrf_token %}
     <button class="btn btn-primary" type="submit">Create Blog</button>
   </form>
 {% endblock %}

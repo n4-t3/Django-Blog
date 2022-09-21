@@ -162,7 +162,6 @@ def top_blogs(request):
     page = pagination.page(current_page)
     my_dict = {
         "blogs":page_obj,
-        "create_comment":CreateComment,
         "number_of_pages": pagination.num_pages,
         "pagination" : pagination,
         "page_has_next":page.has_next(),
@@ -183,7 +182,6 @@ def latest_blogs(request):
     page = pagination.page(current_page)
     my_dict = {
         "blogs":page_obj,
-        "create_comment":CreateComment,
         "number_of_pages": pagination.num_pages,
         "pagination" : pagination,
         "page_has_next":page.has_next(),
@@ -192,3 +190,29 @@ def latest_blogs(request):
         "page_range": pagination.get_elided_page_range(current_page, on_each_side=3, on_ends=2)
     }
     return render(request,'post/latest_blogs.html',context=my_dict)
+
+
+def search_blog(request):
+    if request.GET.get("search_blog"):
+        search = request.GET.get("search_blog")
+        blog = models.Blog.objects.filter(blog_title__contains=search)
+        pagination = Paginator(blog.order_by('-likes'),per_page=6)
+        if len(blog) ==0:
+            messages.error(request,"Search not found!")
+    try:
+        current_page = int(request.GET.get('page',1))
+    except:
+        messages.error(request,"Search not found!")
+        return redirect("post:top_blog")
+    page_obj = pagination.get_page(current_page)
+    page = pagination.page(current_page)
+    my_dict = {
+        "blogs":page_obj,
+        "number_of_pages": pagination.num_pages,
+        "pagination" : pagination,
+        "page_has_next":page.has_next(),
+        "page_has_previous":page.has_previous(),
+        "current_page":current_page, 
+        "page_range": pagination.get_elided_page_range(current_page, on_each_side=3, on_ends=2)
+    }
+    return render(request,'post/top_blogs.html',context=my_dict)
