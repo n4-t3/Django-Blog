@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% load static %}
+{% block bodyblock %}
+<div class="container d-flex justify-content-center my-5">
+  <div class="card" style="width: 20rem;">
+    <img src="{% get_media_prefix %}{{image_path}}" class="card-img-top" alt="profile picture">
+    <div class="card-body">
+      <h5 class="card-title">{{username}}</h5>
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        <p class="card-text">Email: {{ email }}</p>
+      </li>
+      <li class="list-group-item">
+        <p class="card-text">Followers: Feature not added yet</p>
+      </li>
+      <li class="list-group-item">
+        <a href="{% url 'authentication:edit_user' pk=user.id %}" class="btn btn-warning">Edit Profile</a>
+        <a href="{% url 'authentication:delete_user' pk=user.id %}" class="btn btn-danger">Delete Profile</a>
+      </li>
+    </ul>
+  </div>
+</div>
+{% endblock %}

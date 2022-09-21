@@ -39,7 +39,7 @@ def create_blog(request):
 def personal_blog(request,pk):
     user = User.objects.get(pk =pk)
     author = UserProfile.objects.get(user=user)
-    blogs = models.Blog.objects.filter(author=author)
+    blogs = models.Blog.objects.filter(author=author).order_by('-posted_date')
     pagination = Paginator(blogs,per_page=6)
     try:
         current_page = int(request.GET.get('page',1))
@@ -152,7 +152,7 @@ def delete_blog(request,pk):
     return redirect("post:personal_blog", pk=blog.author.user.id) 
 
 def top_blogs(request):
-    pagination = Paginator(models.Blog.objects.all().order_by('-likes'),per_page=4)
+    pagination = Paginator(models.Blog.objects.all().order_by('-likes'),per_page=6)
     try:
         current_page = int(request.GET.get('page',1))
     except:
@@ -173,7 +173,7 @@ def top_blogs(request):
     return render(request,'post/top_blogs.html',context=my_dict)
 
 def latest_blogs(request):
-    pagination = Paginator(models.Blog.objects.all().order_by('-posted_date'),per_page=4)
+    pagination = Paginator(models.Blog.objects.all().order_by('-posted_date'),per_page=6)
     try:
         current_page = int(request.GET.get('page',1))
     except:
