@@ -70,10 +70,11 @@ def read_blog(request,pk):
         main_user = None
     my_dict = {
         "blog":blog,
-        "comments": models.Comment.objects.filter(blog=blog).order_by("-post_date"),
+        "comments": models.Comment.objects.filter(blog=blog).order_by("-id"),
         "user_profile": main_user,
         "is_blog_author":False,
     }
+
     if request.user == blog.author.user:
         my_dict['is_blog_author'] =True
     if request.method == "POST":
@@ -216,3 +217,32 @@ def search_blog(request):
         "page_range": pagination.get_elided_page_range(current_page, on_each_side=3, on_ends=2)
     }
     return render(request,'post/top_blogs.html',context=my_dict)
+
+
+def bookmark(request,pk):
+    if request.user.is_authenticated:
+        blog = models.Blog.objects.get(pk=pk)
+        user_profile = UserProfile.objects.get(user=request.user)
+        if len(UserProfile.objects.filter(bookmarks=blog))==0:
+            user_profile.bookmarks.add(blog)
+            messages.info(request,"Added Bookmark")
+        else:
+            user_profile.bookmarks.remove(blog)
+            messages.warning(request,"Removed Bookmark")
+    else:
+        messages.info(request,"Login to follow or bookmark this post!")
+    return redirect("post:read_blog",pk=pk)
+
+def follow(request,pk):
+    if request.user.is_authenticated:
+        blog = models.Blog.objects.get(pk=pk)
+        user_profile = UserProfile.objects.get(user=request.user)
+        if len(UserProfile.objects.filter(following__username=user_profile.user.username))==0:
+            user_profile.following.add(blog.author.user)
+            messages.info(request,f"Followed {blog.author.user.username}")
+        else:
+            user_profile.following.remove(blog.author.user)
+            messages.info(request,f"Unfollowed {blog.author.user.username}")
+    else:
+        messages.info(request,"Login to follow or bookmark this post!")
+    return redirect("post:read_blog",pk=pk)

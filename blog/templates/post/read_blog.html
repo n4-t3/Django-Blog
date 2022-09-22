@@ -10,6 +10,8 @@
     {% endfor %} {% endif %}
     <h1 class="display-2 text-center">{{blog.blog_title |title}}</h1>
     <small class="lead">Author: {{blog.author.user.username}}</small>
+    <a href="{% url 'post:follow' blog.id %}" class="btn btn-outline-primary ms-2">Follow</a>
+    <a href="{% url 'post:bookmark' blog.id %}" class="btn btn-outline-secondary">Bookmark</a>
     <hr>
     <div class="text-center text-muted lead">Category: {{blog.category}}</div>
     <div class="text-center text-muted lead">Latest Update: {{blog.posted_date|date:"Y/m/d" }}</div>

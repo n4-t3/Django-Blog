@@ -22,4 +22,57 @@
     </ul>
   </div>
 </div>
+{% if following %}
+<hr>
+<div class="container d-flex flex-column align-items-center justify-content-center mb-3">
+  <h1 class="display-4 text-center">Following</h1>
+  {% for person in following %}
+  <ul class="list-group list-group-horizontal">
+    <li class="list-group-item">{{ person }}</li>
+    <li class="list-group-item"><a href="{% url 'authentication:search_following_blog' person.id %}" class="btn btn-primary">Go to
+        Blogs</a></li>
+    <li class="list-group-item"><a href="{% url 'authentication:remove_following' person.id %}" class="btn btn-primary">Remove
+        User</a></li>
+  </ul>
+  {% endfor %}
+</div>
+{% endif %}
+{%if messages %}
+<div class="container d-flex flex-column align-items-center justify-content-center">
+  {% for message in messages %}
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{message}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %} {% endif %}
+  {% if bookmarks %}
+  <hr>
+  <h1 class="display-4 text-center">Bookmarks</h1>
+  <div class="row justify-content-center row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-2 mb-2">
+    {% for blog in bookmarks %}
+    <div class="col">
+      <div class="card">
+        {% if blog.cover_image %}
+        <img src="{{blog.cover_image.url}}" alt="blog cover" class="round-3 img-fluid mb-2" />
+        {% else %}
+        <img src="/media/covers/retrosupply-jLwVAUtLOAQ-unsplash.jpg" alt="blog cover" class="round-3 img-fluid mb-2" />
+        {% endif %}
+        <div class="card-body">
+          <h5 class="card-title display-6 text-center">{{blog.blog_title |title}}</h5>
+          <p class="card-text lead"><small>{{blog.summary}}</small></p>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex flex-row gap-2 justify-content-center">
+            <a href="{% url 'post:read_blog' blog.id %}" class="btn btn-primary">Read</a>
+            <a href="{% url 'post:bookmark' blog.id %}" class="btn btn-danger">Remove</a>
+          </li>
+          <li class="list-group-item lead">Category: <small>{{blog.category|title}}</small></li>
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
 {% endblock %}

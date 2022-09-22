@@ -7,7 +7,9 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import UserProfile
+from post.models import Comment,Blog
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 # Create your views here.
 
 def home_page(request):
@@ -71,13 +73,13 @@ def profile_page(request,pk):
     user = UserProfile.objects.get(user_id=pk)
     if str(request.user) != str(user.user.username):
         return HttpResponseForbidden('Access Restricted!')
-    followers = user.followers
-    bookmarks = user.bookmarks
+    following = user.following.all()
+    bookmarks = user.bookmarks.all()
     my_dict={
         'username':user.user.username,
         'image_path': user.profile_pic.name,
         'email': user.user.email,
-        'followers': followers,
+        'following': following,
         'bookmarks':bookmarks
     }
     if not user.profile_pic.name:
@@ -89,6 +91,14 @@ def delete_user(request,pk):
     user = User.objects.get(pk=pk)
     if str(request.user) != str(user):
         return HttpResponseForbidden('Access Restricted!')
+    user_profile = UserProfile.objects.get(user=user)
+    blogs = Blog.objects.filter(author=user_profile)
+    comments = Comment.objects.filter(comment_author=user_profile)
+    for comment in comments:
+        comment.delete()
+    for blog in blogs:
+        blog.delete()
+    user_profile.delete()
     user.delete()
     return HttpResponseRedirect(reverse('authentication:login_page'))
 
@@ -132,3 +142,39 @@ def edit_user(request,pk):
                         messages.error(request,f"{field2} {error2}")
             return redirect('authentication:edit_user',pk=pk)
     return render(request,'authentication/edit_user.html',context=my_dict)
+
+def remove_following(request,pk):
+    if request.user.is_authenticated:
+        user = User.objects.get(username=request.user)
+        user_profile = UserProfile.objects.get(user=user)
+        following_user_profile = User.objects.get(pk=pk)
+        if len(UserProfile.objects.filter(following__username=user_profile.user.username))!=0:
+            user_profile.following.remove(following_user_profile)
+            messages.info(request,f"Unfollowed {following_user_profile.username}")
+        else:
+            messages.warning(request,"Something went wrong!")
+    else:
+        messages.info(request,"Login to follow or bookmark this post!")
+    return redirect("authentication:profile_page",pk=user.id)
+
+def search_following_blog(request,pk):
+    following_profile = User.objects.get(pk=pk)
+    following_user_profile = UserProfile.objects.get(user=following_profile)
+    pagination = Paginator(Blog.objects.filter(author=following_user_profile).order_by('-posted_date'),per_page=6)
+    try:
+        current_page = int(request.GET.get('page',1))
+    except:
+        messages.error(request,"Page not found!")
+        return redirect("post:latest_blogs")
+    page_obj = pagination.get_page(current_page)
+    page = pagination.page(current_page)
+    my_dict = {
+        "blogs":page_obj,
+        "number_of_pages": pagination.num_pages,
+        "pagination" : pagination,
+        "page_has_next":page.has_next(),
+        "page_has_previous":page.has_previous(),
+        "current_page":current_page, 
+        "page_range": pagination.get_elided_page_range(current_page, on_each_side=3, on_ends=2)
+    }
+    return render(request,'post/latest_blogs.html',context=my_dict)

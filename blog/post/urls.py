@@ -13,4 +13,6 @@ urlpatterns = [
     path('top_blogs/', views.top_blogs, name="top_blogs"),
     path('delete_comment/<int:pk>', views.delete_comment, name="delete_comment"),
     path('search_blog', views.search_blog, name="search_blog"),
+    path('bookmark/<int:pk>/', views.bookmark,name='bookmark'),
+    path('follow/<int:pk>/', views.follow,name='follow'),
 ]
