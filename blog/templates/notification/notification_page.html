@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+{% block bodyblock %}
+<h1 class="display-2">Notification</h1>
+<hr>
+{% if notification %}
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Author</th>
+            <th scope="col">Title</th>
+            <th scope="col">Take a look</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for notice in notification %}
+        <tr>
+            <td>{{notice.author}}</td>
+            <td>{{notice.blog_title}}</td>
+            <td><a href="{% url 'notification:remove_notification' notice.id %}" class="btn btn-primary">Visit</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

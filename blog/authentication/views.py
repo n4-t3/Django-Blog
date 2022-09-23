@@ -10,6 +10,7 @@ from .models import UserProfile
 from post.models import Comment,Blog
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from notification.models import Notification
 # Create your views here.
 
 def home_page(request):
@@ -34,7 +35,7 @@ def signup_page(request):
             if 'profile_pic' in request.FILES:
                 pre_save_time.profile_pic = request.FILES['profile_pic']
             pre_save_time.save()
-            return HttpResponseRedirect(reverse('authentication:home_page'))
+            return HttpResponseRedirect(reverse('authentication:login_page'))
         else:
             if created_form.errors:
                 for field1 in created_form.errors.as_data():
@@ -75,12 +76,14 @@ def profile_page(request,pk):
         return HttpResponseForbidden('Access Restricted!')
     following = user.following.all()
     bookmarks = user.bookmarks.all()
+    followers = user.followers.all()
     my_dict={
         'username':user.user.username,
         'image_path': user.profile_pic.name,
         'email': user.user.email,
+        'followers':followers,
         'following': following,
-        'bookmarks':bookmarks
+        'bookmarks':bookmarks,
     }
     if not user.profile_pic.name:
         my_dict['image_path'] = "/profile_pics/default.jpg"
@@ -94,9 +97,14 @@ def delete_user(request,pk):
     user_profile = UserProfile.objects.get(user=user)
     blogs = Blog.objects.filter(author=user_profile)
     comments = Comment.objects.filter(comment_author=user_profile)
+    notification = Notification.objects.filter(user=user_profile)
+    for notice in notification:
+        notice.delete()
     for comment in comments:
         comment.delete()
     for blog in blogs:
+        for ip in blog.views.all():
+            ip.delete()
         blog.delete()
     user_profile.delete()
     user.delete()
@@ -147,14 +155,32 @@ def remove_following(request,pk):
     if request.user.is_authenticated:
         user = User.objects.get(username=request.user)
         user_profile = UserProfile.objects.get(user=user)
-        following_user_profile = User.objects.get(pk=pk)
+        following_user = User.objects.get(pk=pk)
+        following_user_profile = UserProfile.objects.get(user=following_user)
         if len(UserProfile.objects.filter(following__username=user_profile.user.username))!=0:
-            user_profile.following.remove(following_user_profile)
-            messages.info(request,f"Unfollowed {following_user_profile.username}")
+            user_profile.following.remove(following_user)
+            following_user_profile.followers.remove(user)
+            messages.info(request,f"Unfollowed {following_user.username}")
         else:
             messages.warning(request,"Something went wrong!")
     else:
-        messages.info(request,"Login to follow or bookmark this post!")
+        return HttpResponseForbidden("Access Restricted!")
+    return redirect("authentication:profile_page",pk=user.id)
+
+def remove_follower(request,pk):
+    if request.user.is_authenticated:
+        user = User.objects.get(username=request.user)
+        user_profile = UserProfile.objects.get(user=user)
+        follower_user = User.objects.get(pk=pk)
+        follower_user_profile = UserProfile.objects.get(user=follower_user)
+        if len(UserProfile.objects.filter(followers__username=user_profile.user.username))!=0:
+            user_profile.followers.remove(follower_user)
+            follower_user_profile.following.remove(user)
+            messages.info(request,f"Removed {follower_user.username}")
+        else:
+            messages.warning(request,"Something went wrong!")
+    else:
+        return HttpResponseForbidden("Access Restricted!")
     return redirect("authentication:profile_page",pk=user.id)
 
 def search_following_blog(request,pk):

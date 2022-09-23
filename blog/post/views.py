@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from . import models
 from django.contrib import messages
 from django.core.paginator import Paginator
+from .utils import get_client_ip
+from notification.models import Notification
 # Create your views here.
 
 
@@ -26,6 +28,16 @@ def create_blog(request):
             if 'cover_image' in request.FILES:
                 pre_save_blog.cover_image = request.FILES['cover_image']
             pre_save_blog.save()
+            saved_blog = models.Blog.objects.get(id=pre_save_blog.id)
+            for follower in author.followers.all():
+                follower_profile = UserProfile.objects.get(user=follower)
+                try:
+                    notify = Notification.objects.get(user=follower_profile)
+                except:
+                    notify = Notification()
+                    notify.user = follower_profile
+                    notify.save()
+                notify.notification_page.add(saved_blog)
             return HttpResponseRedirect(reverse('authentication:home_page'))
         else:
             if blog_form.errors:
@@ -73,8 +85,8 @@ def read_blog(request,pk):
         "comments": models.Comment.objects.filter(blog=blog).order_by("-id"),
         "user_profile": main_user,
         "is_blog_author":False,
+        "views": len(blog.views.all())
     }
-
     if request.user == blog.author.user:
         my_dict['is_blog_author'] =True
     if request.method == "POST":
@@ -102,8 +114,18 @@ def read_blog(request,pk):
             messages.info(request,"Login to like or comment on the post!")
             return redirect("post:read_blog",pk=pk)
     else:
-        blog.views = blog.views + 1
-        blog.save()
+        if request.user.is_authenticated:
+            if not request.user.username in [list_of_ips.address for list_of_ips in blog.views.all()]:
+                ip_obj = models.IpAddress()
+                ip_obj.address = request.user.username
+                ip_obj.save()
+                blog.views.add(ip_obj)
+        else:
+            if not get_client_ip(request) in [list_of_ips.address for list_of_ips in blog.views.all()]:
+                ip_obj = models.IpAddress()
+                ip_obj.address = get_client_ip(request)
+                ip_obj.save()
+                blog.views.add(ip_obj)
     return render(request,'post/read_blog.html',context=my_dict)
 
 @login_required
@@ -149,6 +171,9 @@ def delete_blog(request,pk):
     blog = models.Blog.objects.get(id=pk)
     if str(request.user) != str(blog.author.user):
         return HttpResponseForbidden('Access Restricted!')
+    comments = models.Comment.objects.filter(blog=blog)
+    for comment in comments:
+        comment.delete()
     blog.delete()
     return redirect("post:personal_blog", pk=blog.author.user.id) 
 
@@ -223,12 +248,12 @@ def bookmark(request,pk):
     if request.user.is_authenticated:
         blog = models.Blog.objects.get(pk=pk)
         user_profile = UserProfile.objects.get(user=request.user)
-        if len(UserProfile.objects.filter(bookmarks=blog))==0:
-            user_profile.bookmarks.add(blog)
-            messages.info(request,"Added Bookmark")
-        else:
+        if blog in user_profile.bookmarks.all():
             user_profile.bookmarks.remove(blog)
             messages.warning(request,"Removed Bookmark")
+        else:
+            user_profile.bookmarks.add(blog)
+            messages.info(request,"Added Bookmark")
     else:
         messages.info(request,"Login to follow or bookmark this post!")
     return redirect("post:read_blog",pk=pk)
@@ -237,12 +262,14 @@ def follow(request,pk):
     if request.user.is_authenticated:
         blog = models.Blog.objects.get(pk=pk)
         user_profile = UserProfile.objects.get(user=request.user)
-        if len(UserProfile.objects.filter(following__username=user_profile.user.username))==0:
-            user_profile.following.add(blog.author.user)
-            messages.info(request,f"Followed {blog.author.user.username}")
-        else:
+        if blog.author.user in user_profile.following.all():
             user_profile.following.remove(blog.author.user)
+            blog.author.followers.remove(user_profile.user)
             messages.info(request,f"Unfollowed {blog.author.user.username}")
+        else:
+            user_profile.following.add(blog.author.user)
+            blog.author.followers.add(user_profile.user)
+            messages.info(request,f"Followed {blog.author.user.username}")
     else:
         messages.info(request,"Login to follow or bookmark this post!")
     return redirect("post:read_blog",pk=pk)

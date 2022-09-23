@@ -8,6 +8,13 @@ from multiselectfield import MultiSelectField
 CATEGORY_CHOICES = ((1, 'Personal Blog'), (2, 'Business Blog'), (3, 'Technology Blog'), (4, 'Fashion Blog'),(5, 'Education Blog'), (6, 'Health and Fitness Blog'), (7, 'Food Blog'), (8, 'Sports Blog'), (9, 'Travel Blog'), (10, 'Lifestyle Blog'), (11, 'Photography Blog'), (12, 'Political Blog'), (13, 'Parenting Blog'), (14, 'Wedding Blog'), (15, 'Pet Blog'), (16, 'Home Décor Blog'),
 (17, 'DIY Blog'), (18, 'Marketing Blog'), (19, 'Entrepreneur Blog'), (20, 'Gaming Blog'), (21, 'Science Blog'), (22, 'Review Blog'), (23, 'Finance Blog'), (24, 'Music Blog'), (25, 'Movie Blog'))
 
+
+class IpAddress(models.Model):
+    address = models.CharField(max_length=255)
+    def __str__(self):
+        return self.address
+
+        
 class Blog(models.Model):
     author=models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     # created when the object is first created
@@ -23,7 +30,7 @@ class Blog(models.Model):
         max_length=255, default="Summary was not provided :(")
     cover_image=models.ImageField(upload_to='covers', blank=True)
     likes=models.ManyToManyField(UserProfile, related_name='likers')
-    views = models.PositiveIntegerField(default=0,blank=False,null=False)
+    views = models.ManyToManyField(IpAddress, related_name='views')
 
     def __str__(self):
         return self.blog_title

@@ -16,7 +16,7 @@
     <div class="text-center text-muted lead">Category: {{blog.category}}</div>
     <div class="text-center text-muted lead">Latest Update: {{blog.posted_date|date:"Y/m/d" }}</div>
     <p class="lead text-end">Likes: <small>{{blog.likes.all |length}}</small></p>
-    <p class="lead text-end">Views: <small>{{blog.views}}</small></p>
+    <p class="lead text-end">Views: <small>{{views}}</small></p>
     <h3 class="lead mt-2">{{blog.summary}}.</h3>
     <p class="lead">{{blog.blog_body | safe}}</p>
     <form method="POST">

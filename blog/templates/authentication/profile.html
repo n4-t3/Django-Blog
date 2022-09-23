@@ -22,6 +22,21 @@
     </ul>
   </div>
 </div>
+{% if followers %}
+<hr>
+<div class="container d-flex flex-column align-items-center justify-content-center mb-3">
+  <h1 class="display-4 text-center">Followers</h1>
+  {% for person in followers %}
+  <ul class="list-group list-group-horizontal">
+    <li class="list-group-item">{{ person }}</li>
+    <li class="list-group-item"><a href="{% url 'authentication:search_following_blog' person.id %}" class="btn btn-primary">Go to
+        Blogs</a></li>
+    <li class="list-group-item"><a href="{% url 'authentication:remove_follower' person.id %}" class="btn btn-primary">Remove
+        User</a></li>
+  </ul>
+  {% endfor %}
+</div>
+{% endif %}
 {% if following %}
 <hr>
 <div class="container d-flex flex-column align-items-center justify-content-center mb-3">
