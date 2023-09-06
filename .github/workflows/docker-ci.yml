@@ -17,10 +17,11 @@ jobs:
       - name: Build Docker image
         run: docker-compose build
 
-      - name: Set up .env file
-        run: echo "$ENV_FILE" > .env
-        env:
-          ENV_FILE: ${{ secrets.ENV_FILE }}
+      - name: Create an empty .env file
+        run: touch .env
+
+      - name: Populate .env from secret
+        run: echo "${{ secrets.ENV_FILE }}" > .env
 
       - name: Start Docker Compose services
         run: docker-compose up -d
