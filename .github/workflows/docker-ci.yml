@@ -30,7 +30,6 @@ jobs:
           docker-compose exec django-blog pylint blog/
         env:
           DOCKER_CLI_ACI: "1" # enables Application Container Image; it allows Docker to use the docker exec command
-        depends-on: build-and-test
 
       - name: Stop Docker Compose services
         run: docker-compose down
