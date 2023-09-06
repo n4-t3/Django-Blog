@@ -53,8 +53,8 @@ In the root directory run the following
 1. Build and run the container
 
 ```
-docker build -t djangocontainer .
-docker-compose run -it djangocontainer
+docker build -t `CONTAINER NAME` .
+docker-compose run -it `CONTAINER NAME`
 ```
 
 - Since we are using docker-compose we will use
