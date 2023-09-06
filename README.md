@@ -17,7 +17,7 @@ python generate_secret_key.py
 
 Use `.env.example` to see the required environmental variables.
 
-### Without docker
+### Without Docker
 
 Install virtual environment
 
@@ -46,7 +46,7 @@ cd blog/
 python manage.py runserver
 ```
 
-### With docker
+### With Docker
 
 In the root directory run the following
 
@@ -70,7 +70,7 @@ docker-compose up
 docker-compose up -d
 ```
 
-3.  check all the containers that are currently running
+3. Check all the containers that are currently running
 
 ```
 docker-compose ps
@@ -87,4 +87,12 @@ docker-compose exec -it `CONTAINER NAME` bash
 ```
 docker-compose down
 docker-compose stop `CONTAINER NAME`
+```
+
+### Contributions
+
+You may contribute to this project by creating pull request, make sure linting and CI passes. You may check for issues during linting in pylint_report.txt file created by running the following command.
+
+```
+pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt
 ```
