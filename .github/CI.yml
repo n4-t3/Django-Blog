@@ -1,0 +1,32 @@
+name: Pylint CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install dependencies
+        run: |
+          pip install pylint
+
+      - name: Run Pylint
+        run: |
+          pylint --rcfile=.pylintrc blog/
+        continue-on-error: false
+
+      - name: Check Pylint score
+        run: |
+          pylint --rcfile=.pylintrc --score=blog/ | grep 'Your code has been rated at 10.0/10'
