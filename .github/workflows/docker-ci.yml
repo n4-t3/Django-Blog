@@ -1,0 +1,36 @@
+name: Docker CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker-compose build
+
+      - name: Set up .env file
+        run: echo "$ENV_FILE" > .env
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+
+      - name: Start Docker Compose services
+        run: docker-compose up -d
+
+      - name: Run Pylint
+        run: |
+          docker-compose exec django-blog pylint blog/
+        env:
+          DOCKER_CLI_ACI: "1" # enables Application Container Image; it allows Docker to use the docker exec command
+        depends-on: build-and-test
+
+      - name: Stop Docker Compose services
+        run: docker-compose down
