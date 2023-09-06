@@ -14,14 +14,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build Docker image
-        run: docker-compose build
-
       - name: Create an empty .env file
         run: touch .env
 
       - name: Populate .env from secret
         run: echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: Build Docker image
+        run: docker-compose build
 
       - name: Start Docker Compose services
         run: docker-compose up -d
