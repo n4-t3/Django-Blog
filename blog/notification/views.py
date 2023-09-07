@@ -3,7 +3,6 @@ from post.models import Blog
 from authentication.models import UserProfile
 from .models import Notification
 from django.contrib.auth.models import User
-from post.views import read_blog
 # Create your views here.
 
 def notification_page(request,id):

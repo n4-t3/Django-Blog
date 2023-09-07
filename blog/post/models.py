@@ -1,4 +1,3 @@
-from unicodedata import category
 from django.db import models
 from authentication.models import UserProfile
 from ckeditor.fields import RichTextField

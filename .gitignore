@@ -1,3 +1,4 @@
 .env
 env/
 /blog/*/__pycache__/
+pylint_report.txt

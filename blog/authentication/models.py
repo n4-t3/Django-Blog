@@ -9,6 +9,5 @@ class UserProfile(models.Model):
     followers = models.ManyToManyField(User,related_name='followers',blank = True)
     bookmarks = models.ManyToManyField('post.Blog',related_name='bookmarks',blank = True)
     profile_pic = models.ImageField(upload_to='profile_pics',blank = True)
-    
     def __str__(self):
         return self.user.username

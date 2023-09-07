@@ -1,7 +1,6 @@
 from django.http import HttpResponse,HttpResponseRedirect,HttpResponseForbidden
 from django.urls import reverse
 from django.shortcuts import render,redirect
-from django import forms
 from .forms import UserCreationForm,UserCreationDate
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required

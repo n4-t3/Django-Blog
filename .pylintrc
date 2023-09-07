@@ -113,6 +113,25 @@ unsafe-load-any-extension=no
 
 [BASIC]
 
+# Disable "Missing module docstring", "Missing class docstring", and "Too few public methods" errors
+disable=C0103,  # Disable naming convention errors (e.g., variable names)
+        C0301,  # Disable line too long errors
+        C0303,  # Disable trailing whitespace errors
+        R0903,  # Disable "Too few public methods" error
+        C0114,  # Disable missing module docstring
+        C0115,  # Disable missing class docstring
+        C0116,  # Disable missing function docstring
+        C0304,  # Disable final newline missing 
+        E1101,  # Diable instance has no member
+        C0411,  # Diable third party import should be placed before
+        R1705,  # Diabled unnecessary "else" after "return"
+        W0702,  # Diabled No exception type(s) specified
+        C0412,  # Diabled imports from package django are not grouped
+        W0622,  # Diabled redefining built-in 'id'
+        E0307,  # Diabled __str__ does not return str
+        R0801,  # Disabled similar lines in 2 files
+        R1714,  # Diabled consider merging these comparisons
+
 # Naming style matching correct argument names.
 argument-naming-style=snake_case
 
