@@ -29,9 +29,7 @@ jobs:
       - name: Run Pylint
         id: pylint
         run: |
-          pylint blog/**/*.py
-        env:
-          DOCKER_CLI_ACI: "1" # enables Application Container Image; it allows Docker to use the docker exec command
+          pip install -r Requirements.txt && pylint blog/**/*.py
 
       - name: Stop Docker Compose services
         run: docker-compose down
