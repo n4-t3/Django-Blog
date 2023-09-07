@@ -29,7 +29,7 @@ jobs:
       - name: Run Pylint
         id: pylint
         run: |
-          pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt
+          docker-compose exec --tty=false django-blog pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt
           pylint_exit_code=$?
           if [ $pylint_exit_code -eq 0 ]; then
             echo "Pylint passed with a perfect 10/10 score."
