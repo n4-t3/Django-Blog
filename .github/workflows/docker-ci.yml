@@ -41,6 +41,15 @@ jobs:
         env:
           DOCKER_CLI_ACI: "1" # enables Application Container Image; it allows Docker to use the docker exec command
 
+      - name: Check File Existence
+        run: |
+          if [ -f pylint_report.txt ]; then
+            echo "File found: pylint_report.txt"
+            cat pylint_report.txt
+          else
+            echo "File not found: pylint_report.txt"
+          fi
+
       - name: Check Pylint Report
         run: |
           if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
