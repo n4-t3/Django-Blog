@@ -29,17 +29,11 @@ jobs:
       - name: Run Pylint
         id: pylint
         run: |
-          docker-compose exec --tty=false django-blog pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt
+          docker-compose exec --tty=false django-blog bash -c 'cd .. && pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt'
           pylint_exit_code=$?
           if [ $pylint_exit_code -eq 0 ]; then
             echo "Pylint test run successfully."
-            if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
-              echo "Pylint passed with a perfect 10/10 score."
-              echo "::set-output name=pylint_success::true"
-            else
-              echo "Pylint did not get a perfect score."
-              echo "::set-output name=pylint_success::false"
-            fi
+            echo "::set-output name=pylint_success::true"
           else
             echo "Pylint test run failed."
             echo "::set-output name=pylint_success::false"
@@ -50,19 +44,21 @@ jobs:
       - name: Stop Docker Compose services
         run: docker-compose down
 
-      - name: Check File Existence
-        run: |
-          if [ -f pylint_report.txt ]; then
-            cat pylint_report.txt
-          else
-            echo "File not found: pylint_report.txt"
-          fi
-          if [ -f manage.py ]; then
-            cat manage.py
-          else
-            echo "File not found: manage.py"
-          fi
-
-      - name: Check Pylint Result
+      - name: Check if Pylint testing was Successful
         if: steps.pylint.outputs.pylint_success == 'true'
-        run: echo "Pylint passed with a perfect 10/10 score."
+        run: |
+          echo "Pylint test run successfully."
+        else
+          echo "Pylint test run failed."
+          exit 1
+
+      - name: Check Pylint Report
+        run: |
+          if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
+            echo "Pylint passed with a perfect 10/10 score."
+            echo "::set-output name=pylint_success::true"
+          else
+            echo "Pylint did not get a perfect score."
+            echo "::set-output name=pylint_success::false"
+            exit 1 
+          fi
