@@ -29,7 +29,7 @@ jobs:
       - name: Run Pylint
         id: pylint
         run: |
-          pylint_output=$(docker-compose exec --tty=false django-blog bash -c 'cd .. && pylint ignore=*/migrations/*.py blog/**/*.py')
+          pylint_output=$(docker-compose exec --tty=false django-blog bash -c 'cd .. && pylint blog/**/*.py')
           echo "$pylint_output"
           if [[ "$pylint_output" == *"10.00/10"* ]]; then
             echo "Pylint check passed"
