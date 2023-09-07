@@ -45,13 +45,10 @@ jobs:
         run: docker-compose down
 
       - name: Check if Pylint testing was Successful
+        if: steps.pylint.outputs.pylint_success != 'true'
         run: |
-          if steps.pylint.outputs.pylint_success == 'true'; then
-            echo "Pylint test run successfully."
-          else
-            echo "Pylint test run failed."
-            exit 1 
-          fi
+          echo "Pylint test run failed."
+          exit 1
 
       - name: Check Pylint Report
         run: |
