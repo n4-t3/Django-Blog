@@ -29,8 +29,9 @@ jobs:
       - name: Run Pylint
         id: pylint
         run: |
+          echo "Current directory: $(pwd)"
+          echo "Contents of the current directory: $(ls)"
           docker-compose exec --tty=false django-blog bash -c 'cd .. && pylint blog/**/*.py'
-
         env:
           DOCKER_CLI_ACI: "1" # enables Application Container Image; it allows Docker to use the docker exec command
 
