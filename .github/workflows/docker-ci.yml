@@ -26,10 +26,11 @@ jobs:
       - name: Start Docker Compose services
         run: docker-compose up -d
 
+      - name: Install Requirements
+        run: pip install -r test-requirements.txt
+
       - name: Run Pylint
-        id: pylint
-        run: |
-          pip install -r Requirements.txt && pylint blog/**/*.py
+        run: pylint blog/**/*.py
 
       - name: Stop Docker Compose services
         run: docker-compose down
