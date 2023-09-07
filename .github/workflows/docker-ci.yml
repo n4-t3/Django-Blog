@@ -48,8 +48,7 @@ jobs:
         if: steps.pylint.outputs.pylint_success == 'true'
         run: |
           echo "Pylint test run successfully."
-        else
-          echo "Pylint test run failed."
+        else: echo "Pylint test run failed."
           exit 1
 
       - name: Check Pylint Report
