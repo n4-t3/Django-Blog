@@ -28,6 +28,7 @@ jobs:
 
       - name: Run Pylint
         id: pylint
+        working-directory: ./Django-blog
         run: |
           docker-compose exec --tty=false django-blog bash -c 'cd .. && pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt'
           pylint_exit_code=$?
@@ -56,6 +57,7 @@ jobs:
         run: docker-compose down
 
       - name: Check Pylint Report
+        working-directory: ./Django-blog
         run: |
           if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
             echo "Pylint passed with a perfect 10/10 score."
