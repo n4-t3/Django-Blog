@@ -29,14 +29,8 @@ jobs:
       - name: Run Pylint
         id: pylint
         run: |
-          pylint_output=$(docker-compose exec --tty=false django-blog bash -c 'cd .. && pylint blog/**/*.py')
-          echo "$pylint_output"
-          if [[ "$pylint_output" == *"10.00/10"* ]]; then
-            echo "Pylint check passed"
-          else
-            echo "Pylint check failed"
-            exit 1
-          fi
+          docker-compose exec --tty=false django-blog bash -c 'cd .. && pylint blog/**/*.py'
+
         env:
           DOCKER_CLI_ACI: "1" # enables Application Container Image; it allows Docker to use the docker exec command
 
