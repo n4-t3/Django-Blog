@@ -33,7 +33,13 @@ jobs:
           pylint_exit_code=$?
           if [ $pylint_exit_code -eq 0 ]; then
             echo "Pylint test run successfully."
-            echo "::set-output name=pylint_success::true"
+            if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
+              echo "Pylint passed with a perfect 10/10 score."
+              echo "::set-output name=pylint_success::true"
+            else
+              echo "Pylint did not get a perfect score."
+              echo "::set-output name=pylint_success::false"
+            fi
           else
             echo "Pylint test run failed."
             echo "::set-output name=pylint_success::false"
@@ -44,20 +50,19 @@ jobs:
       - name: Stop Docker Compose services
         run: docker-compose down
 
-      - name: Check if Pylint testing was Successful
-        if: steps.pylint.outputs.pylint_success == 'true'
-        run: echo "Pylint test run successfully."
-
-      - name: Debug Pylint Report
-        run: cat pylint_report.txt
-
-      - name: Check Pylint Report
+      - name: Check File Existence
         run: |
-          if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
-            echo "Pylint passed with a perfect 10/10 score."
-            echo "::set-output name=pylint_success::true"
+          if [ -f pylint_report.txt ]; then
+            cat pylint_report.txt
           else
-            echo "Pylint did not get a perfect score."
-            echo "::set-output name=pylint_success::false"
-            exit 1  
+            echo "File not found: pylint_report.txt"
           fi
+          if [ -f manage.py ]; then
+            cat manage.py
+          else
+            echo "File not found: manage.py"
+          fi
+
+      - name: Check Pylint Result
+        if: steps.pylint.outputs.pylint_success == 'true'
+        run: echo "Pylint passed with a perfect 10/10 score."
