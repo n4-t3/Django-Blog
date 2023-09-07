@@ -29,74 +29,16 @@ jobs:
       - name: Run Pylint
         id: pylint
         run: |
-          docker-compose exec --tty=false django-blog bash -c 'pwd && cd .. && pwd && ls && pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt'
-          pylint_exit_code=$?
-          if [ -f pylint_report.txt ]; then
-            echo "File found: pylint_report.txt"
-            cat pylint_report.txt
+          pylint_output=$(docker-compose exec --tty=false django-blog bash -c 'cd .. && pylint ignore=*/migrations/*.py blog/**/*.py')
+          echo "$pylint_output"
+          if [[ "$pylint_output" == *"10.00/10"* ]]; then
+            echo "Pylint check passed"
           else
-            echo "File not found: pylint_report.txt"
-          fi
-          if [ $pylint_exit_code -eq 0 ]; then
-            if [ -f pylint_report.txt ]; then
-              echo "File found: pylint_report.txt"
-              cat pylint_report.txt
-            else
-              echo "File not found: pylint_report.txt"
-            fi
-            echo "Pylint test run successfully."
-            echo "::set-output name=pylint_success::true"
-          else
-            echo "Pylint test run failed."
-            echo "::set-output name=pylint_success::false"
+            echo "Pylint check failed"
+            exit 1
           fi
         env:
           DOCKER_CLI_ACI: "1" # enables Application Container Image; it allows Docker to use the docker exec command
 
-      - name: Wait for File
-        run: sleep 10 # Adjust the delay as needed
-
-      - name: Check File Existence 1
-        run: |
-          if [ -f pylint_report.txt ]; then
-            echo "File found: pylint_report.txt"
-            cat pylint_report.txt
-          else
-            echo "File not found: pylint_report.txt"
-          fi
-
-      - name: Check File Existence 2
-        run: |
-          cd ..
-          if [ -f pylint_report.txt ]; then
-            echo "File found: pylint_report.txt"
-            cat pylint_report.txt
-          else
-            echo "File not found: pylint_report.txt"
-          fi
-
-      - name: Check Pylint Report
-        run: |
-          if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
-            echo "Pylint passed with a perfect 10/10 score."
-            echo "::set-output name=pylint_success::true"
-          else
-            echo "Pylint did not get a perfect score."
-            echo "::set-output name=pylint_success::false"
-            exit 1 
-          fi
-
       - name: Stop Docker Compose services
         run: docker-compose down
-
-      - name: Check Pylint Report
-        working-directory: ./Django-blog
-        run: |
-          if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
-            echo "Pylint passed with a perfect 10/10 score."
-            echo "::set-output name=pylint_success::true"
-          else
-            echo "Pylint did not get a perfect score."
-            echo "::set-output name=pylint_success::false"
-            exit 1 
-          fi
