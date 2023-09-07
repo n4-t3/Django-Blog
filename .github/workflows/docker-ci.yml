@@ -20,7 +20,7 @@ jobs:
       - name: Populate .env from secret
         run: echo "${{ secrets.ENV_FILE }}" > .env
 
-      - name: Build Docker image
+      - name: Build Docker Compose image
         run: docker-compose build
 
       - name: Start Docker Compose services
@@ -32,10 +32,10 @@ jobs:
           docker-compose exec --tty=false django-blog pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt
           pylint_exit_code=$?
           if [ $pylint_exit_code -eq 0 ]; then
-            echo "Pylint passed with a perfect 10/10 score."
+            echo "Pylint test run successfully."
             echo "::set-output name=pylint_success::true"
           else
-            echo "Pylint did not get a perfect score."
+            echo "Pylint test run failed."
             echo "::set-output name=pylint_success::false"
           fi
         env:
@@ -49,7 +49,6 @@ jobs:
         run: echo "Pylint test run successfully."
 
       - name: Check Pylint Report
-        id: pylint_report
         run: |
           if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
             echo "Pylint passed with a perfect 10/10 score."
@@ -57,8 +56,5 @@ jobs:
           else
             echo "Pylint did not get a perfect score."
             echo "::set-output name=pylint_success::false"
+            exit 1  # This will cause the CI job to fail
           fi
-
-      - name: Pylint Result
-        if: steps.pylint_report.outputs.pylint_success == 'true'
-        run: echo "Pylint passed with a perfect 10/10 score."
