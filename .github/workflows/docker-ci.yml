@@ -29,7 +29,7 @@ jobs:
       - name: Run Pylint
         id: pylint
         run: |
-          docker-compose exec --tty=false django-blog bash -c 'cd .. && pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt'
+          docker-compose exec --tty=false django-blog bash -c 'pwd && cd .. && pwd && ls && pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt'
           pylint_exit_code=$?
           if [ -f pylint_report.txt ]; then
             echo "File found: pylint_report.txt"
