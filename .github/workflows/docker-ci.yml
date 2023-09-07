@@ -26,11 +26,19 @@ jobs:
       - name: Start Docker Compose services
         run: docker-compose up -d
 
-      - name: Install Requirements
+      - name: Stop Docker Compose services
+        run: docker-compose down
+
+      - name: Install Test Requirements
         run: pip install -r test-requirements.txt
 
       - name: Run Pylint
-        run: pylint blog/**/*.py
-
-      - name: Stop Docker Compose services
-        run: docker-compose down
+        run: |
+          pylint_output=$(pylint blog/**/*.py)
+          echo "$pylint_output"
+          if [[ "$pylint_output" == *"10.00/10"* ]]; then
+            echo "Pylint check passed"
+          else
+            echo "Pylint check failed"
+            exit 1
+          fi
