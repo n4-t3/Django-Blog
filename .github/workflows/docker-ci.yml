@@ -44,6 +44,21 @@ jobs:
       - name: Stop Docker Compose services
         run: docker-compose down
 
-      - name: Check Pylint result
+      - name: Check if Pylint testing was Successful
         if: steps.pylint.outputs.pylint_success == 'true'
-        run: echo "Pylint passed."
+        run: echo "Pylint test run successfully."
+
+      - name: Check Pylint Report
+        id: pylint_report
+        run: |
+          if grep -q "Your code has been rated at 10.00/10" pylint_report.txt; then
+            echo "Pylint passed with a perfect 10/10 score."
+            echo "::set-output name=pylint_success::true"
+          else
+            echo "Pylint did not get a perfect score."
+            echo "::set-output name=pylint_success::false"
+          fi
+
+      - name: Pylint Result
+        if: steps.pylint_report.outputs.pylint_success == 'true'
+        run: echo "Pylint passed with a perfect 10/10 score."
