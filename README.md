@@ -91,8 +91,8 @@ docker-compose stop `CONTAINER NAME`
 
 ### Contributions
 
-You may contribute to this project by creating pull request, make sure linting and CI passes. You may check for issues during linting in pylint_report.txt file created by running the following command.
+You may contribute to this project by creating pull request, make sure linting and CI passes. You may check for issues during linting by adding required files to `test-requirements.txt` and then running
 
 ```
-pylint --output-format=text --ignore=*/migrations/*.py blog/**/*.py > pylint_report.txt
+pylint blog/**/*.py
 ```
