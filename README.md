@@ -5,17 +5,21 @@ Blog with:
 - Backend and Authentication: **_Django_**
 - Frontend: **_Bootstrap_** and **_Django Template_**
 
+### Project Showcase
+
+[![Project Showcase](video/thumbnail.PNG)](video/showcase.mp4)
+
 ### How to Locally Run the Project
 
 Run your database and add the database name, user, password and host in the `.env` file
 Make sure to also add the secret key to the `.env` file; you can generate a new one by heading to the path where the file `generate_secret_key.py` exists and run the following command.
 
+- You may change the `.env.sample` file to `.env` file to test the project.
+
 ```
 cd blog/
 python generate_secret_key.py
 ```
-
-Use `.env.example` to see the required environmental variables.
 
 ### Without Docker
 
@@ -96,3 +100,7 @@ You may contribute to this project by creating pull request, make sure linting a
 ```
 pylint blog/**/*.py
 ```
+
+### Contributions
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
