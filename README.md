@@ -21,8 +21,6 @@ cd blog/
 python generate_secret_key.py
 ```
 
-Use `.env.example` to see the required environmental variables.
-
 ### Without Docker
 
 Install virtual environment
