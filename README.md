@@ -9,7 +9,7 @@ Blog with:
 
 ### Project Showcase
 
-[![Project Showcase](video/thumbnail.PNG)](video/showcase.mp4)
+https://github.com/user-attachments/assets/dcb3e454-55d0-4d91-b9fa-3ebc0d18faef
 
 ### How to Locally Run the Project
 
